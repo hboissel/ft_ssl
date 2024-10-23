@@ -6,6 +6,20 @@
 # include <stdlib.h>
 # include <string.h>
 # include <stdio.h>
+# include <ctype.h>
+# include <errno.h>
+
+typedef struct s_ssl_file {
+    char *name;
+    char *content;
+    char error;
+} t_ssl_file;
+
+typedef struct s_ssl_result {
+    char *stdin_content;
+    char *sum;
+    t_ssl_file *file;
+} t_ssl_result;
 
 typedef struct s_ssl {
     char *command;
@@ -13,13 +27,21 @@ typedef struct s_ssl {
     char append;
     char reverse;
     char *sum;
-    char **files;
+    t_ssl_file *files;
     char *stdin_content;
+    t_ssl_result result;
 } t_ssl;
 
 char    ft_ssl(int argc, char **argv);
 char    parsing(t_ssl *ssl, int argc, char **argv);
 void    print_help(void);
 char    *get_stdin_content(void);
+char    md5(t_ssl *ssl);
+char    sha256(t_ssl *ssl);
+char    *get_file_content(char *path);
+void    print_upper(char *str);
+void print_ssl_result(t_ssl *ssl);
+
+void fill_with_fake_hashes(t_ssl *ssl, int num_files);
 
 #endif

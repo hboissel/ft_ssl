@@ -2,3 +2,4 @@ ft_ssl
 *.o
 *.d
 /obj
+test

@@ -10,7 +10,10 @@ DBG_DIR =	dbg
 
 SRC = $(SRC_DIR)/main.c \
       $(SRC_DIR)/ft_ssl.c \
+	  $(SRC_DIR)/ft_ssl_results.c \
 	  $(SRC_DIR)/parsing.c \
+	  $(SRC_DIR)/md5.c \
+	  $(SRC_DIR)/sha256.c \
 	  $(SRC_DIR)/utils.c
 
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(BIN_DIR)/%.o)
@@ -23,7 +26,7 @@ DBG_DEPS = $(SRC:$(SRC_DIR)/%.c=$(DBG_DIR)/%.d)
 
 INCLUDES = ./inc
 
-CFLAGS = -Werror -Wextra -Wall -I$(INCLUDES)
+CFLAGS = -Werror -Wextra -Wall -pedantic -I$(INCLUDES)
 
 all :	$(NAME)
 

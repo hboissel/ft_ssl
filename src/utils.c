@@ -42,3 +42,84 @@ char    *get_stdin_content(void)
     content[total_len] = '\0';
     return (content);
 }
+
+// Function to fill the struct with fake data
+void fill_with_fake_hashes(t_ssl *ssl, int num_files) {
+    char *fake_hash = "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+    t_ssl_file *files = ssl->files;
+    t_ssl_result *result = &ssl->result;
+
+    if (ssl->stdin_content) {
+        result->stdin_content = (char *)malloc(strlen(fake_hash) * sizeof(char));
+        strcpy(result->stdin_content, fake_hash);
+    }
+    if (ssl->sum) {
+        result->sum = (char *)malloc(strlen(fake_hash) * sizeof(char));
+        strcpy(result->sum, fake_hash);
+    }
+    if (!num_files) {
+        return;
+    }
+    result->file = (t_ssl_file *)malloc((num_files + 1) * sizeof(t_ssl_file));
+    for (int i = 0; i < num_files; i++) {
+        result->file[i].name = files[i].name;
+        if (files[i].error) {
+            result->file[i].content = strdup(files[i].content);
+            result->file[i].error = 1;
+            continue;
+        }
+        result->file[i].content = (char *)malloc(strlen(fake_hash) * sizeof(char));
+        strcpy(result->file[i].content, fake_hash);
+        result->file[i].error = 0;
+    }
+    result->file[num_files].content = NULL;
+    result->file[num_files].name = NULL;
+    result->file[num_files].error = 0;
+}
+
+/// Function that from a path to a file, reads the content of the file
+/// Parameters:
+///     - path: the path to the file
+/// Return:
+///     - a pointer to the content of the file
+char    *get_file_content(char *path)
+{
+    int     fd;
+    char    *content;
+    char    buffer[1024];
+    int     len;
+    int     total_len;
+
+    if ((fd = open(path, O_RDONLY)) < 0)
+    {
+        return (NULL);
+    }
+    total_len = 0;
+    content = NULL;
+    while ((len = read(fd, buffer, 1024)) > 0)
+    {
+        content = realloc(content, total_len + len + 1);
+        memcpy(content + total_len, buffer, len);
+        total_len += len;
+    }
+    if (len < 0)
+    {
+        free(content);
+        return (NULL);
+    } else if (len == 0)
+    {
+        content = realloc(content, total_len + 1);
+    }
+    content[total_len] = '\0';
+    close(fd);
+    return (content);
+}
+
+// Function that print a string toupper
+void    print_upper(char *str)
+{
+    for (int i = 0; str[i]; i++)
+    {
+        printf("%c", toupper(str[i]));
+    }
+}
