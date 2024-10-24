@@ -99,6 +99,11 @@ char    *get_file_content(char *path)
     while ((len = read(fd, buffer, 1024)) > 0)
     {
         content = realloc(content, total_len + len + 1);
+        if (!content)
+        {
+            free(content);
+            return (NULL);
+        }
         memcpy(content + total_len, buffer, len);
         total_len += len;
     }
@@ -109,10 +114,32 @@ char    *get_file_content(char *path)
     } else if (len == 0)
     {
         content = realloc(content, total_len + 1);
+        if (!content)
+        {
+            free(content);
+            return (NULL);
+        }
     }
     content[total_len] = '\0';
     close(fd);
     return (content);
+}
+
+/// Function that returns the number of files thanks to a t_ssl_file pointer
+int    get_num_files(t_ssl_file *files)
+{
+    int i;
+
+    if (!files)
+    {
+        return (0);
+    }
+    i = 0;
+    while (files[i].name)
+    {
+        i++;
+    }
+    return (i);
 }
 
 // Function that print a string toupper
@@ -122,4 +149,11 @@ void    print_upper(char *str)
     {
         printf("%c", toupper(str[i]));
     }
+}
+
+/// Function that print error messages based on the t_ssl structure
+char print_ssl_erno(t_ssl *ssl)
+{
+    printf("ft_ssl: %s: %s\n", ssl->command, strerror(errno));
+    return (1);
 }

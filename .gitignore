@@ -3,3 +3,4 @@ ft_ssl
 *.d
 /obj
 test
+file

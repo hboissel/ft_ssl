@@ -120,13 +120,11 @@ char ft_ssl(int argc, char **argv)
     init_ssl(&ssl);
     if (parsing(&ssl, argc, argv))
         return (1);
-    //print_ssl(&ssl);
     if (process_ssl(&ssl))
     {
         free_ssl(&ssl);
         return (1);
     }
-    //print_ssl(&ssl);
     free_ssl(&ssl);
     return (0);
 }

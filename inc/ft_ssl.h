@@ -8,6 +8,7 @@
 # include <stdio.h>
 # include <ctype.h>
 # include <errno.h>
+# include <stdint.h>
 
 typedef struct s_ssl_file {
     char *name;
@@ -41,6 +42,9 @@ char    sha256(t_ssl *ssl);
 char    *get_file_content(char *path);
 void    print_upper(char *str);
 void print_ssl_result(t_ssl *ssl);
+int    get_num_files(t_ssl_file *files);
+void print_ssl(t_ssl *ssl);
+char print_ssl_erno(t_ssl *ssl);
 
 void fill_with_fake_hashes(t_ssl *ssl, int num_files);
 

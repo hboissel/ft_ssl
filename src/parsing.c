@@ -131,6 +131,11 @@ char get_files_content(t_ssl *ssl)
         if (!ssl->files[i].content)
         {
             ssl->files[i].content = strdup(strerror(errno));
+            if (!ssl->files[i].content)
+            {
+                printf("ft_ssl: Error: Failed to read from file\n");
+                return (1);
+            }
             ssl->files[i].error = 1;
         }
         i++;
