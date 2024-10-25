@@ -1,6 +1,6 @@
 #include "ft_ssl.h"
 
-char hash_prep(t_ssl *ssl, hash_func process_hash, const unsigned hash_size)
+char hash_prep(t_ssl *ssl, hash_func_process process_hash, const unsigned hash_size)
 {
     char *message;
     char hash[hash_size + 1];

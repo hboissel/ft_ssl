@@ -19,23 +19,17 @@ void init_ssl(t_ssl *ssl)
     init_ssl_result(&ssl->result);
 }
 
-char    get_result(t_ssl *ssl)
+char get_result(t_ssl *ssl)
 {
-    char *list_cmd[3] = {"md5", "sha256", NULL};
+    const char *list_cmd[3] = {"md5", "sha256", NULL};
+    hash_func hash_functions[3] = {md5, sha256, NULL};
+
     int i = 0;
     while (list_cmd[i] && strcmp(list_cmd[i], ssl->command) != 0)
-    {
         i++;
-    }
-    switch (i)
-    {
-        case 0:
-            return md5(ssl);
-        case 1:
-            return sha256(ssl);
-        default:
-            return (1);
-    }
+    if (hash_functions[i])
+        return hash_functions[i](ssl);
+    return 1;
 }
 
 char    process_ssl(t_ssl *ssl)
