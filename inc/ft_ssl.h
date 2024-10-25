@@ -33,6 +33,8 @@ typedef struct s_ssl {
     t_ssl_result result;
 } t_ssl;
 
+typedef int (*hash_func)(const char *message, char *hash);
+
 char    ft_ssl(int argc, char **argv);
 char    parsing(t_ssl *ssl, int argc, char **argv);
 void    print_help(void);
@@ -41,11 +43,14 @@ char    md5(t_ssl *ssl);
 char    sha256(t_ssl *ssl);
 char    *get_file_content(char *path);
 void    print_upper(char *str);
-void print_ssl_result(t_ssl *ssl);
-int    get_num_files(t_ssl_file *files);
-void print_ssl(t_ssl *ssl);
-char print_ssl_erno(t_ssl *ssl);
+void    print_ssl_result(t_ssl *ssl);
+int     get_num_files(t_ssl_file *files);
+void    print_ssl(t_ssl *ssl);
+char    print_ssl_erno(t_ssl *ssl);
+char    hash_prep(t_ssl *ssl, hash_func process_hash, const unsigned hash_size);
 
+// Function for testing
 void fill_with_fake_hashes(t_ssl *ssl, int num_files);
+void print_ssl(t_ssl *ssl);
 
 #endif

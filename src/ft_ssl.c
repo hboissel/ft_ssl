@@ -1,47 +1,5 @@
 #include "ft_ssl.h"
 
-void print_ssl(t_ssl *ssl)
-{
-    //print header
-    printf("*** SSL ***\n");
-    printf("Command: %s\n", ssl->command);
-    printf("Quiet: %d\n", ssl->quiet);
-    printf("Append: %d\n", ssl->append);
-    printf("Reverse: %d\n", ssl->reverse);
-    printf("Sum: %s\n", ssl->sum);
-    if (ssl->files)
-    {
-        printf("Files:\n");
-        for (int i = 0; ssl->files[i].name; i++)
-        {
-            printf("\tFile: %s\n", ssl->files[i].name);
-            printf("\tContent: %s\n", ssl->files[i].content);
-        }
-    } else {
-        printf("Files: NULL\n");
-    }
-    printf("Stdin content: %s\n", ssl->stdin_content);
-    printf("Result:\n");
-    if (ssl->result.stdin_content)
-    {
-        printf("\tStdin result content: %s\n", ssl->result.stdin_content);
-    }
-    if (ssl->result.sum)
-    {
-        printf("\tSum result: %s\n", ssl->result.sum);
-    }
-    if (ssl->result.file)
-    {
-        printf("\tFiles result:\n");
-        for (int i = 0; ssl->result.file[i].name; i++)
-        {
-            printf("\t\tFile: %s\n", ssl->result.file[i].name);
-            printf("\t\tContent: %s\n", ssl->result.file[i].content);
-            printf("\t\tError: %d\n", ssl->result.file[i].error);
-        }
-    }
-}
-
 void init_ssl_result(t_ssl_result *ssl_result)
 {
     ssl_result->stdin_content = NULL;

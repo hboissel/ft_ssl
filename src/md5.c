@@ -1,6 +1,14 @@
 #include "ft_ssl.h"
 
 #define LEFTROTATE(x, c) (((x) << (c)) | ((x) >> (32 - (c))))
+#define F(B, C, D) ((B & C) | ((~B) & D))
+#define G(B, C, D) ((B & D) | ((~D) & C))
+#define H(B, C, D) (B ^ C ^ D)
+#define I(B, C, D) (C ^ (B | (~D)))
+#define GET_INDEX(i) (i < 16 ? i : (i < 32 ? (5 * i + 1) % 16 : (i < 48 ? (3 * i + 5) % 16 : (7 * i) % 16)))
+
+#define MD5_HASH_SIZE 32
+#define MD5_BLOCK_SIZE 64
 
 static const uint32_t K[64] = {
     0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
@@ -25,26 +33,6 @@ static const uint32_t r[64] = {
     5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
     4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
     6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
-
-uint32_t F(uint32_t B, uint32_t C, uint32_t D)
-{
-    return (B & C) | ((~B) & D);
-}
-
-uint32_t G(uint32_t B, uint32_t C, uint32_t D)
-{
-    return (B & D) | ((~D) & C);
-}
-
-uint32_t H(uint32_t B, uint32_t C, uint32_t D)
-{
-    return B ^ C ^ D;
-}
-
-uint32_t I(uint32_t B, uint32_t C, uint32_t D)
-{
-    return C ^ (B | (~D));
-}
 
 void combine(uint32_t *A, uint32_t *B, uint32_t *C, uint32_t *D, uint32_t M[], uint32_t i, uint32_t md5_index)
 {
@@ -71,30 +59,17 @@ void combine(uint32_t *A, uint32_t *B, uint32_t *C, uint32_t *D, uint32_t M[], u
     *D = D_prime;
 }
 
-uint32_t get_index(uint32_t i)
-{
-    if (i < 16)
-        return i;
-    else if (i < 32)
-        return (5 * i + 1) % 16;
-    else if (i < 48)
-        return (3 * i + 5) % 16;
-    else
-        return (7 * i) % 16;
-}
-
 void process_block(uint32_t state[4], uint32_t M[16])
 {
     uint32_t A = state[0], B = state[1], C = state[2], D = state[3];
     uint32_t md5_index = 0;
 
-    for (uint32_t i = 0; i < 64; i++)
+    for (uint32_t i = 0; i < MD5_BLOCK_SIZE; i++)
     {
-        md5_index = get_index(i);
+        md5_index = GET_INDEX(i);
         combine(&A, &B, &C, &D, M, i, md5_index);
     }
 
-    // Update the state
     state[0] += A;
     state[1] += B;
     state[2] += C;
@@ -123,7 +98,7 @@ char convert_to_proper_512_bits_blocks(const char *msg, uint32_t **blocks, uint6
     return (0);
 }
 
-char md5_process(const char *msg, char hash[33])
+int md5_process(const char *msg, char hash[33])
 {
     uint32_t state[4];
     uint32_t *blocks;
@@ -157,60 +132,9 @@ char md5_process(const char *msg, char hash[33])
     return (0);
 }
 
-char md5_prep(t_ssl *ssl)
-{
-    char *message;
-    char hash[33];
-    int num_files = get_num_files(ssl->files);
-
-    if (ssl->stdin_content)
-    {
-        message = ssl->stdin_content;
-        if (md5_process(message, hash))
-            return print_ssl_erno(ssl);
-        ssl->result.stdin_content = strdup(hash);
-    }
-    if (ssl->sum)
-    {
-        message = ssl->sum;
-        if (md5_process(message, hash))
-            return print_ssl_erno(ssl);
-        ssl->result.sum = strdup(hash);
-    }
-    if (ssl->files)
-    {
-        ssl->result.file = (t_ssl_file *)malloc((num_files + 1) * sizeof(t_ssl_file));
-        if (!ssl->result.file)
-            return print_ssl_erno(ssl);
-        for (int i = 0; ssl->files[i].name; i++)
-        {
-            ssl->result.file[i].name = ssl->files[i].name;
-            if (ssl->files[i].error)
-            {
-                ssl->result.file[i].content = strdup(ssl->files[i].content);
-                if (!ssl->result.file[i].content)
-                    return print_ssl_erno(ssl);
-                ssl->result.file[i].error = 1;
-                continue;
-            }
-            message = ssl->files[i].content;
-            if (md5_process(message, hash))
-                return print_ssl_erno(ssl);
-            ssl->result.file[i].content = strdup(hash);
-            if (!ssl->result.file[i].content)
-                return print_ssl_erno(ssl);
-            ssl->result.file[i].error = 0;
-        }
-        ssl->result.file[num_files].content = NULL;
-        ssl->result.file[num_files].name = NULL;
-        ssl->result.file[num_files].error = 0;
-    }
-    return (0);
-}
-
 char md5(t_ssl *ssl)
 {
-    if (md5_prep(ssl))
+    if (hash_prep(ssl, md5_process, MD5_HASH_SIZE))
         return (1);
     return (0);
 }

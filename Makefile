@@ -14,6 +14,7 @@ SRC = $(SRC_DIR)/main.c \
 	  $(SRC_DIR)/parsing.c \
 	  $(SRC_DIR)/md5.c \
 	  $(SRC_DIR)/sha256.c \
+	  $(SRC_DIR)/hash_utils.c \
 	  $(SRC_DIR)/utils.c
 
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(BIN_DIR)/%.o)
