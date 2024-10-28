@@ -49,9 +49,11 @@ int     get_num_files(t_ssl_file *files);
 void    print_ssl(t_ssl *ssl);
 char    print_ssl_erno(t_ssl *ssl);
 char    hash_prep(t_ssl *ssl, hash_func_process process_hash, const unsigned hash_size);
+char    convert_str_to_512bits_blocks(const char *msg, uint32_t **blocks, uint64_t *numBlocks, char bigEndian);
+void    convert_hash_to_hex(uint32_t *H, char *hash, unsigned num_hash_words, unsigned hash_output_size);
 
 // Function for testing
-void fill_with_fake_hashes(t_ssl *ssl, int num_files);
-void print_ssl(t_ssl *ssl);
+void    fill_with_fake_hashes(t_ssl *ssl, int num_files);
+void    print_ssl(t_ssl *ssl);
 
 #endif

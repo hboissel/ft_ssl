@@ -40,29 +40,32 @@ char    process_ssl(t_ssl *ssl)
     return (0);
 }
 
+void free_and_nullify(char **ptr) {
+    if (*ptr) {
+        free(*ptr);
+        *ptr = NULL;
+    }
+}
+
+void free_ssl_file_array(t_ssl_file *files) {
+    if (files) {
+        for (int i = 0; files[i].name; i++) {
+            free(files[i].content);
+            files[i].content = NULL;
+        }
+        free(files);
+    }
+}
+
 void free_ssl(t_ssl *ssl)
 {
-    if (ssl->files)
-    {
-        for (int i = 0; ssl->files[i].name; i++)
-        {
-            free(ssl->files[i].content);
-        }
-        free(ssl->files);
-    }
-    free(ssl->stdin_content);
-    if (ssl->result.stdin_content)
-        free(ssl->result.stdin_content);
-    if (ssl->result.sum)
-        free(ssl->result.sum);
-    if (ssl->result.file)
-    {
-        for (int i = 0; ssl->result.file[i].name; i++)
-        {
-            free(ssl->result.file[i].content);
-        }
-        free(ssl->result.file);
-    }
+    free_ssl_file_array(ssl->files);
+    ssl->files = NULL;
+    free_ssl_file_array(ssl->result.file);
+    ssl->result.file = NULL;
+    free_and_nullify(&ssl->stdin_content);
+    free_and_nullify(&ssl->result.stdin_content);
+    free_and_nullify(&ssl->result.sum);
 }
 
 char ft_ssl(int argc, char **argv)
