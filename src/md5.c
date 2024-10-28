@@ -9,6 +9,7 @@
 
 #define MD5_HASH_SIZE 32
 #define MD5_BLOCK_SIZE 64
+#define MD5_NUM_HASH_WORDS 4
 
 static const uint32_t K[64] = {
     0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
@@ -34,7 +35,7 @@ static const uint32_t r[64] = {
     4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
     6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21};
 
-void combine(uint32_t *A, uint32_t *B, uint32_t *C, uint32_t *D, uint32_t M[], uint32_t i, uint32_t md5_index)
+static void combine(uint32_t *A, uint32_t *B, uint32_t *C, uint32_t *D, uint32_t M[], uint32_t i, uint32_t md5_index)
 {
     uint32_t F_value;
     uint32_t A_prime = *D;
@@ -59,7 +60,7 @@ void combine(uint32_t *A, uint32_t *B, uint32_t *C, uint32_t *D, uint32_t M[], u
     *D = D_prime;
 }
 
-void process_block(uint32_t state[4], uint32_t M[16])
+static void process_block(uint32_t state[4], uint32_t M[16])
 {
     uint32_t A = state[0], B = state[1], C = state[2], D = state[3];
     uint32_t md5_index = 0;
@@ -76,35 +77,13 @@ void process_block(uint32_t state[4], uint32_t M[16])
     state[3] += D;
 }
 
-// Function to convert a string to a list of 512-bit blocks
-char convert_to_proper_512_bits_blocks(const char *msg, uint32_t **blocks, uint64_t *numBlocks)
-{
-    uint64_t msgLen = strlen(msg);
-    uint64_t bitLen = msgLen * 8;
-
-    *numBlocks = (msgLen + 8) / 64 + 1;
-    *blocks = (uint32_t *)malloc(*numBlocks * 16 * sizeof(uint32_t));
-    if (*blocks == NULL)
-        return (1);
-    memset(*blocks, 0, *numBlocks * 16 * sizeof(uint32_t));
-    for (uint64_t i = 0; i < msgLen; i++)
-        ((uint8_t *)*blocks)[i] = (uint8_t)msg[i];
-    ((uint8_t *)*blocks)[msgLen] = 0x80;
-    uint64_t paddingStart = msgLen + 1;
-    while (paddingStart < (*numBlocks * 64))
-        ((uint8_t *)*blocks)[paddingStart++] = 0;
-    for (int i = 0; i < 8; i++)
-        ((uint8_t *)*blocks)[(*numBlocks * 64) - 8 + i] = (uint8_t)(bitLen >> (i * 8));
-    return (0);
-}
-
-int md5_process(const char *msg, char hash[33])
+static int md5_process(const char *msg, char hash[33])
 {
     uint32_t state[4];
     uint32_t *blocks;
     uint64_t numBlocks;
 
-    if (convert_to_proper_512_bits_blocks(msg, &blocks, &numBlocks))
+    if (convert_str_to_512bits_blocks(msg, &blocks, &numBlocks, 0))
         return (1);
 
     state[0] = 0x67452301; // A
@@ -113,22 +92,11 @@ int md5_process(const char *msg, char hash[33])
     state[3] = 0x10325476; // D
 
     for (uint64_t i = 0; i < numBlocks; i++)
-    {
         process_block(state, &blocks[i * 16]);
-    }
 
     free(blocks);
 
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            unsigned char byte = (state[i] >> (j * 8)) & 0xff;
-            hash[i * 8 + j * 2] = "0123456789abcdef"[byte >> 4];
-            hash[i * 8 + j * 2 + 1] = "0123456789abcdef"[byte & 0x0F];
-        }
-    }
-    hash[32] = '\0';
+    convert_hash_to_hex(state, hash, MD5_NUM_HASH_WORDS, MD5_HASH_SIZE);
     return (0);
 }
 

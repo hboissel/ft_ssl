@@ -19,6 +19,7 @@ void    print_help(void)
 char    *get_stdin_content(void)
 {
     char    *content;
+    char    *tmp;
     char    buffer[1024];
     int     len;
     int     total_len;
@@ -27,7 +28,13 @@ char    *get_stdin_content(void)
     content = NULL;
     while ((len = read(0, buffer, 1024)) > 0)
     {
-        content = realloc(content, total_len + len + 1);
+        tmp = realloc(content, total_len + len + 1);
+        if (!tmp)
+        {
+            free(content);
+            return (NULL);
+        }
+        content = tmp;
         memcpy(content + total_len, buffer, len);
         total_len += len;
     }
@@ -37,7 +44,13 @@ char    *get_stdin_content(void)
         return (NULL);
     } else if (len == 0)
     {
-        content = realloc(content, total_len + 1);
+        tmp = realloc(content, total_len + 1);
+        if (!tmp)
+        {
+            free(content);
+            return (NULL);
+        }
+        content = tmp;
     }
     content[total_len] = '\0';
     return (content);
@@ -57,9 +70,7 @@ char    *get_file_content(char *path)
     int     total_len;
 
     if ((fd = open(path, O_RDONLY)) < 0)
-    {
         return (NULL);
-    }
     total_len = 0;
     content = NULL;
     while ((len = read(fd, buffer, 1024)) > 0)
@@ -97,14 +108,10 @@ int    get_num_files(t_ssl_file *files)
     int i;
 
     if (!files)
-    {
         return (0);
-    }
     i = 0;
     while (files[i].name)
-    {
         i++;
-    }
     return (i);
 }
 
@@ -112,9 +119,7 @@ int    get_num_files(t_ssl_file *files)
 void    print_upper(char *str)
 {
     for (int i = 0; str[i]; i++)
-    {
         printf("%c", toupper(str[i]));
-    }
 }
 
 /// Function that print error messages based on the t_ssl structure

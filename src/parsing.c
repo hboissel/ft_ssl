@@ -28,6 +28,14 @@ char check_command(t_ssl *ssl, char *cmd)
     return (1);
 }
 
+int get_flag_index(char *arg, char **flags) {
+    for (int j = 0; flags[j]; j++) {
+        if (strcmp(flags[j], arg) == 0)
+            return j;
+    }
+    return -1;
+}
+
 /// Function which parses the flags
 /// Parameters:
 ///   - ssl: a pointer to the t_ssl structure
@@ -41,16 +49,10 @@ char    parse_flags(t_ssl *ssl, int argc, char **argv, int *i)
 {
     char *flags[] = {"-q", "-r", "-p", "-s", NULL};
     if (!argv || !argc || !i)
-    {
         return (0);
-    }
     while (*i < argc && argv[*i] && argv[*i][0] == '-')
     {
-        int j = 0;
-        while (flags[j] && strcmp(flags[j], argv[*i]) != 0)
-        {
-            j++;
-        }
+        int j = get_flag_index(argv[*i], flags);
         switch (j)
         {
             case 0:
@@ -93,15 +95,11 @@ char parse_arguments(t_ssl *ssl, int argc, char **argv)
     int i = 0;
     int nb_files = 0;
     if (!argv || !argc)
-    {
         return (0);
-    }
     if (parse_flags(ssl, argc, argv, &i))
         return (1);
     if (i >= argc)
-    {
         return (0);
-    }
     nb_files = argc - i;
     ssl->files = (t_ssl_file *)malloc((nb_files + 1) * sizeof(t_ssl_file));
     for (int j = 0; i < argc; i++, j++)
@@ -132,10 +130,7 @@ char get_files_content(t_ssl *ssl)
         {
             ssl->files[i].content = strdup(strerror(errno));
             if (!ssl->files[i].content)
-            {
-                printf("ft_ssl: Error: Failed to read from file\n");
-                return (1);
-            }
+                return print_ssl_erno(ssl);
             ssl->files[i].error = 1;
         }
         i++;
@@ -146,15 +141,10 @@ char get_files_content(t_ssl *ssl)
 char parse_stdin_content(t_ssl *ssl)
 {
     if (!ssl->append && (ssl->sum || ssl->files))
-    {
         return (0);
-    }
     ssl->stdin_content = get_stdin_content();
     if (!ssl->stdin_content)
-    {
-        printf("ft_ssl: Error: Failed to read from stdin\n");
-        return (1);
-    }
+        return print_ssl_erno(ssl);
     return (0);
 }
 

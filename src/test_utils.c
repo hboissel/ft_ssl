@@ -17,19 +17,14 @@ void print_ssl(t_ssl *ssl)
             printf("\tFile: %s\n", ssl->files[i].name);
             printf("\tContent: %s\n", ssl->files[i].content);
         }
-    } else {
+    } else
         printf("Files: NULL\n");
-    }
     printf("Stdin content: %s\n", ssl->stdin_content);
     printf("Result:\n");
     if (ssl->result.stdin_content)
-    {
         printf("\tStdin result content: %s\n", ssl->result.stdin_content);
-    }
     if (ssl->result.sum)
-    {
         printf("\tSum result: %s\n", ssl->result.sum);
-    }
     if (ssl->result.file)
     {
         printf("\tFiles result:\n");
@@ -56,9 +51,8 @@ void fill_with_fake_hashes(t_ssl *ssl, int num_files) {
         result->sum = (char *)malloc(strlen(fake_hash) * sizeof(char));
         strcpy(result->sum, fake_hash);
     }
-    if (!num_files) {
+    if (!num_files)
         return;
-    }
     result->file = (t_ssl_file *)malloc((num_files + 1) * sizeof(t_ssl_file));
     for (int i = 0; i < num_files; i++) {
         result->file[i].name = files[i].name;
