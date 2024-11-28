@@ -4,10 +4,10 @@ Simple OpenSSL implementation in C
 ## md5
 
 
-- [ ] -p, echo STDIN to STDOUT and append the checksum to STDOUT
-- [ ] -q, quiet mode
-- [ ] -r, reverse the format of the output.
-- [ ] -s, print the sum of the given string
+- [x] -p, echo STDIN to STDOUT and append the checksum to STDOUT
+- [x] -q, quiet mode
+- [x] -r, reverse the format of the output.
+- [x] -s, print the sum of the given string
 
 ### -p
 
@@ -93,10 +93,10 @@ ft_ssl: md5: bar: No such file or directory
 
 ## sha256
 
-- [ ] -p, echo STDIN to STDOUT and append the checksum to STDOUT
-- [ ] -q, quiet mode
-- [ ] -r, reverse the format of the output.
-- [ ] -s, print the sum of the given string
+- [x] -p, echo STDIN to STDOUT and append the checksum to STDOUT
+- [x] -q, quiet mode
+- [x] -r, reverse the format of the output.
+- [x] -s, print the sum of the given string
 
 The flags are the same and their behavior too.
 
